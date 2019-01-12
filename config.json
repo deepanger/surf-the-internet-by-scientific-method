@@ -1,0 +1,89 @@
+{
+  "inbounds": [
+    {
+      "port": 1080,
+      "protocol": "socks",
+      "domainOverride": [
+        "tls",
+        "http"
+      ],
+      "settings": {
+        "auth": "noauth"
+      }
+    },
+    {
+      "port": 8080,
+      "protocol": "http",
+      "domainOverride": [
+        "tls",
+        "http"
+      ],
+      "settings": {
+        "auth": "noauth"
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "proxy-vmess",
+      "protocol": "vmess",
+      "settings": {
+        "vnext": [
+          {
+            "address": "127.0.0.1", //你开通的服务器的ip地址
+            "port": 5050, //开通的服务器的端口号
+            "users": [
+              {
+                "id": "", //和服务端id号一致
+                "alterId": 64 // 这个也需要和服务端一致
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "tag": "direct",
+      "settings": {},
+      "protocol": "freedom"
+    },
+    {
+      "tag": "block",
+      "settings": {},
+      "protocol": "blackhole"
+    }
+  ],
+  "dns": {
+    "server": [
+      "8.8.8.8",
+      "1.1.1.1",
+      "8.8.4.4"
+    ]
+  },
+  "routing": {
+    "domainStrategy": "IPOnDemand",
+    "rules": [
+      {
+        "type": "field",
+        "ip": [
+          "geoip:cn"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "cnblogs.com"
+        ],
+        "outboundTag": "proxy-vmess"
+      }
+    ]
+  }
+}
